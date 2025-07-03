@@ -1,8 +1,12 @@
 const { body } = require("express-validator");
 const { default: parsePhoneNumberFromString } = require("libphonenumber-js");
 const signupValidation = [
-  body("username").notEmpty().withMessage("Name field is required"),
-  body("email").isEmail().withMessage("Invalid email"),
+  body("username")
+    .trim()
+    .escape()
+    .notEmpty()
+    .withMessage("Name field is required"),
+  body("email").normalizeEmail().isEmail().withMessage("Invalid email"),
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
