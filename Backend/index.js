@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const carsRouter = require("./routers/cars.router");
 const limiter = require("express-rate-limit");
 const reviewRouter = require("./routers/review.router");
+const profileRouter = require("./routers/profile.router");
 
 app.use(cookieParser());
 
@@ -29,7 +30,7 @@ app.use("/api/v1/cars", carsRouter);
 
 app.use("/api/v1/user/reviews", reviewRouter);
 
-app.use("/api/v1/user/profile", reviewRouter);
+app.use("/api/v1/user/profile", profileRouter);
 
 app.use(errorMiddleware);
 

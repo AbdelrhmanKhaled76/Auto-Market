@@ -115,13 +115,13 @@ const getReview = async (req, res, next) => {
   try {
     const Review = await reviewModel.findById(reviewId);
 
-    if (!previousReview) {
+    if (!Review) {
       const err = new Error("review not found");
       err.statusCode = 404;
       return next(err);
     }
 
-    if (previousReview.madeBy.toString() !== req.user.id) {
+    if (Review.madeBy.toString() !== req.user.id) {
       const err = new Error("forbidden: You can only delete your own review");
       err.statusCode = 403;
       return next(err);
@@ -133,7 +133,7 @@ const getReview = async (req, res, next) => {
       data: Review,
     });
   } catch (error) {
-    return next(err);
+    return next(error);
   }
 };
 

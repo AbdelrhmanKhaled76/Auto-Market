@@ -25,13 +25,11 @@ const editProfileInfo = async (req, res, next) => {
   const { username, email, phoneNumber } = req.body;
   try {
     const userInfo = await userModel.findById(req.user.id).select("-password");
-
     if (!userInfo) {
       const err = new Error("user not found");
       err.statusCode = 404;
       return next(err);
     }
-
     if (
       userInfo.username === username &&
       userInfo.email === email &&
@@ -43,14 +41,20 @@ const editProfileInfo = async (req, res, next) => {
     }
 
     const updatedUser = await userModel
-      .findByIdAndUpdate(req.user.id, {
-        $set: {
-          email,
-          password,
-          phoneNumber,
-          updatedAt: new Date(),
+      .findByIdAndUpdate(
+        req.user.id,
+        {
+          $set: {
+            email,
+            username,
+            phoneNumber,
+            updatedAt: new Date(),
+          },
         },
-      })
+        {
+          new: true,
+        }
+      )
       .select("-password");
 
     return res.status(200).json({

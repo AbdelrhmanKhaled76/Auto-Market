@@ -48,13 +48,12 @@ reviewRouter.delete(
 
 reviewRouter.get(
   "/:reviewId",
-  json(),
   authMiddleware,
   getReviewValidation,
   ValidationMiddleware,
   getReview
 );
 
-reviewRouter.get("/", json(), getAllReviews);
+reviewRouter.get("/", getAllReviews);
 
 module.exports = reviewRouter;

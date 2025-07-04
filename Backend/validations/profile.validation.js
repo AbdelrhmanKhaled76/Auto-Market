@@ -1,6 +1,7 @@
 const { body } = require("express-validator");
+const { default: parsePhoneNumberFromString } = require("libphonenumber-js");
 
-const editProfileInfo = [
+const editProfileInfoValidation = [
   body("username")
     .notEmpty()
     .withMessage("username field is required")
@@ -22,20 +23,23 @@ const editProfileInfo = [
       const phone = value.startsWith("+")
         ? parsePhoneNumberFromString(value) // full international
         : parsePhoneNumberFromString(value, "EG"); // local format fallback
-
       if (!phone || !phone.isValid()) {
         throw new Error("Invalid phone number format");
       }
-
       return true;
     }),
 ];
 
-const editProfilePassword = [
-  body("password").notEmpty().withMessage("password field is required"),
+const editProfilePasswordValidation = [
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+  body("confirmPassword")
+    .custom((value, { req }) => value === req.body.password)
+    .withMessage("Passwords must match"),
 ];
 
 module.exports = {
-  editProfileInfo,
-  editProfilePassword,
+  editProfileInfoValidation,
+  editProfilePasswordValidation,
 };
