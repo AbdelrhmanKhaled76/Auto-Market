@@ -18,8 +18,8 @@ const AppRoutes = () => {
           <Route index element={<Home />} />
           <Route path="browse-cars" element={<BrowseCars />} />
           <Route path="sell-car" element={<SellCar />} />
-          <Route path="signup" element={<Signup />} />
-          <Route path="signin" element={<SignIn />} />
+          <Route path="sign-up" element={<Signup />} />
+          <Route path="sign-in" element={<SignIn />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         <Route path="*" element={<NotFound />} />
