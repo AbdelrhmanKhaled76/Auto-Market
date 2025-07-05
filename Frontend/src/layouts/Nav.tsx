@@ -6,7 +6,7 @@ function Nav() {
   return (
     <nav className="shadow-lg w-full sticky top-0 left-0 z-50 bg-white">
       <div className="flex justify-between items-center container py-3 ">
-        <div className="flex justify-between items-center gap-2 cursor-pointer group">
+        <div className="flex justify-between items-center gap-5 cursor-pointer group">
           <FontAwesomeIcon
             icon={faCarSide}
             className="p-3 transition-colors duration-500 group-hover:bg-[var(--secondary-color)] bg-[var(--primary-color)] rounded-xl text-white"
