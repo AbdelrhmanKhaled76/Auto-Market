@@ -138,15 +138,7 @@ const sellCar = async (req, res, next) => {
       publicId: result.public_id,
     }));
 
-    const decoded = req.user;
-
-    if (!decoded || !decoded.id) {
-      const err = new Error("User not authorized");
-      err.statusCode = 403;
-      return next(err);
-    }
-
-    const user = await userModel.findById(decoded.id);
+    const user = await userModel.findById(req.user.id).select("-password");
 
     if (!user) {
       const err = new Error("user not found");
@@ -161,7 +153,7 @@ const sellCar = async (req, res, next) => {
       features,
       fuelType,
       images,
-      seller: decoded.id,
+      seller: user,
       make,
       mileage,
       model,
@@ -171,7 +163,7 @@ const sellCar = async (req, res, next) => {
       featured,
     });
 
-    await userModel.findByIdAndUpdate(decoded.id, {
+    await userModel.findByIdAndUpdate(req.user.id, {
       $push: { selling: car._id },
     });
 
