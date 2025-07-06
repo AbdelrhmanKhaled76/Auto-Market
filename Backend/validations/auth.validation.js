@@ -27,7 +27,7 @@ const signupValidation = [
 ];
 
 const signInValidation = [
-  body("email").notEmpty().withMessage("email field can't be empty"),
+  body("email").normalizeEmail().isEmail().withMessage("Invalid email"),
   body("password").notEmpty().withMessage("password field can't be empty"),
 ];
 

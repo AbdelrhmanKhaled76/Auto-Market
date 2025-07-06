@@ -38,6 +38,9 @@ const carSchema = new mongoose.Schema(
       required: true,
     },
     createdAt: { type: Date, default: Date.now },
+    featured: {
+      type: Boolean,
+    },
   },
   { timestamps: true }
 );

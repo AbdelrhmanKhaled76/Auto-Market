@@ -114,6 +114,7 @@ const sellCar = async (req, res, next) => {
     bodyType,
     features,
     description,
+    featured,
   } = req.body;
 
   try {
@@ -138,7 +139,7 @@ const sellCar = async (req, res, next) => {
     }));
 
     const decoded = req.user;
-    
+
     if (!decoded || !decoded.id) {
       const err = new Error("User not authorized");
       err.statusCode = 403;
@@ -167,6 +168,7 @@ const sellCar = async (req, res, next) => {
       price,
       transmission,
       year,
+      featured,
     });
 
     await userModel.findByIdAndUpdate(decoded.id, {

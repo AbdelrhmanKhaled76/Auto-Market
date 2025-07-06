@@ -55,6 +55,9 @@ const sellCarValidation = [
     .withMessage("condition must be one of : excellent, good, fair, poor"),
   body("features").notEmpty().withMessage("features field is required"),
   body("description").notEmpty().withMessage("description field is required"),
+  body("featured")
+    .isBoolean()
+    .withMessage("featured must be a boolean of true or false value"),
 ];
 
 module.exports = {
