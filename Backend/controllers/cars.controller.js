@@ -47,7 +47,7 @@ const recentCars = async (req, res, next) => {
 
 const allCars = async (req, res, next) => {
   const currentPage = parseInt(req.query.currentPage) || 1;
-  const CarsNum = parseInt(req.query.CarsNum) || 10; // default 10 per page
+  const CarsNum = parseInt(req.query.carsNum) || 6; // default 10 per page
 
   try {
     const carsCount = await carModel.countDocuments();
