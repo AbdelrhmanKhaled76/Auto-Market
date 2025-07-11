@@ -13,6 +13,7 @@ const {
   CLOUD_SECRET,
   CLOUD_API_KEY,
   CLOUD_NAME,
+  Origin,
 } = process.env;
 
 module.exports = {
@@ -26,4 +27,5 @@ module.exports = {
   CLOUD_API_KEY,
   CLOUD_NAME,
   CLOUD_SECRET,
+  Origin,
 };

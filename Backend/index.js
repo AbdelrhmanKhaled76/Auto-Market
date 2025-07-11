@@ -1,5 +1,5 @@
 const express = require("express");
-const { PORT } = require("./config/env");
+const { PORT, Origin } = require("./config/env");
 const db_connection = require("./config/db_connection");
 const authRouter = require("./routers/auth.router");
 const errorMiddleware = require("./middlewares/error.middleware");
@@ -9,20 +9,30 @@ const carsRouter = require("./routers/cars.router");
 const limiter = require("express-rate-limit");
 const reviewRouter = require("./routers/review.router");
 const profileRouter = require("./routers/profile.router");
+const cors = require("cors");
+
+app.use(
+  cors({
+    credentials: true,
+    origin: Origin,
+    methods: ["POST", "GET", "PATCH", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(cookieParser());
 
-app.use(
-  "/api",
-  limiter({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: {
-      success: false,
-      message: "Too many requests from this IP, please try again later.",
-    },
-  })
-);
+// app.use(
+//   "/api",
+//   limiter({
+//     windowMs: 15 * 60 * 1000,
+//     max: 100,
+//     message: {
+//       success: false,
+//       message: "Too many requests from this IP, please try again later.",
+//     },
+//   })
+// );
 
 app.use("/api/v1/auth", authRouter);
 

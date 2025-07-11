@@ -139,7 +139,7 @@ const getReview = async (req, res, next) => {
 
 const getAllReviews = async (req, res, next) => {
   try {
-    const reviews = await reviewModel.find();
+    const reviews = await reviewModel.find().populate("madeBy");
 
     return res.status(200).json({
       message: "reviews are retrieved successfully",
