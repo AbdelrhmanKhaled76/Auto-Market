@@ -1,8 +1,19 @@
 import { faCarSide } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect } from "react";
 import { NavLink } from "react-router-dom";
+import { RefreshToken } from "../services/authService";
 
 function Nav() {
+  // useEffect(() => {
+  //   RefreshToken()
+  //     .then((res) => {
+  //       console.log(res);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
   return (
     <nav className="shadow-lg w-full sticky top-0 left-0 z-50 bg-white">
       <div className="flex justify-between items-center container py-3 ">
@@ -50,7 +61,18 @@ function Nav() {
         <div>
           <ul className="flex justify-between items-center gap-13">
             <li className="capitalize font-medium text-sm">
-              <NavLink to="/sell-car">sell car</NavLink>
+              <NavLink
+                to="/sell-car"
+                className={({ isActive }) =>
+                  `capitalize font-medium text-sm px-3 py-2 ${
+                    isActive
+                      ? "bg-[var(--primary-color)]/10 rounded text-[var(--primary-color)]"
+                      : ""
+                  }`
+                }
+              >
+                sell car
+              </NavLink>
             </li>
             <li className="capitalize font-medium text-sm">
               <NavLink
