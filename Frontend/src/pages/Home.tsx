@@ -7,18 +7,19 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import CarsCard from "../components/CarsCard";
+import CarsCard from "../components/ui/CarsCard";
 import { getFeaturedCars, getRecentCars } from "../services/carsService";
 import type { CarType } from "../interfaces/Cars/Car";
 import type { ReviewType } from "../interfaces/review/review";
 import { getAllReviews } from "../services/reviewsService";
-import ReviewCard from "../components/ReviewCard";
+import ReviewCard from "../components/ui/ReviewCard";
 function Home() {
   const [featuredCars, setFeaturedCars] = useState<CarType[] | null>(null);
   const [RecentCars, setRecentCars] = useState<CarType[] | null>(null);
   const [allReviews, setAllReviews] = useState<ReviewType[] | null>(null);
 
   useEffect(() => {
+    // fetching all data
     Promise.all([getFeaturedCars(), getRecentCars(), getAllReviews()])
       .then(([featuredCars, recentCars, reviews]) => {
         setFeaturedCars(featuredCars.data);
@@ -120,8 +121,9 @@ function Home() {
             </Link>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 py-10">
-            {featuredCars?.map((car) => <CarsCard value={car} />) ||
-              "no available cars at the moment"}
+            {featuredCars?.map((car) => (
+              <CarsCard key={car._id} value={car} />
+            )) || "no available cars at the moment"}
           </div>
         </div>
       </section>
@@ -145,7 +147,7 @@ function Home() {
             </Link>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 py-10">
-            {RecentCars?.map((car) => <CarsCard value={car} />) ||
+            {RecentCars?.map((car) => <CarsCard key={car._id} value={car} />) ||
               "no available cars at the moment"}
           </div>
         </div>
@@ -160,8 +162,9 @@ function Home() {
             reak reviews from real customers
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 py-10">
-            {allReviews?.map((review) => <ReviewCard review={review} />) ||
-              "no available reviews"}
+            {allReviews?.map((review) => (
+              <ReviewCard key={review._id} review={review} />
+            )) || "no available reviews"}
           </div>
         </div>
       </section>

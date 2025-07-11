@@ -1,7 +1,12 @@
 import axiosInstance from "../interceptors/auth-interceptor";
 
-export const getAllCars = async () => {
-  const response = await axiosInstance.get("cars");
+export const getAllCars = async (currentPage: number, carsNum: number) => {
+  const response = await axiosInstance.get("cars", {
+    params: {
+      currentPage,
+      carsNum,
+    },
+  });
   return response.data;
 };
 

@@ -7,7 +7,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
-import type { CarType } from "../interfaces/Cars/Car";
+import type { CarType } from "../../interfaces/Cars/Car";
+
 
 function CarsCard({ value }: { value: CarType }) {
   const labelColorMap = {
@@ -60,15 +61,15 @@ function CarsCard({ value }: { value: CarType }) {
             {value.year}
           </span>
           <span>
-            <FontAwesomeIcon icon={faStopwatch} className="pe-3" />$
+            <FontAwesomeIcon icon={faStopwatch} className="pe-3" />
             {value.mileage} mi
           </span>
           <span>
-            <FontAwesomeIcon icon={faGear} className="pe-3" />$
+            <FontAwesomeIcon icon={faGear} className="pe-3" />
             {value.transmission}
           </span>
           <span>
-            <FontAwesomeIcon icon={faGasPump} className="pe-3" />$
+            <FontAwesomeIcon icon={faGasPump} className="pe-3" />
             {value.fuelType}
           </span>
         </div>
