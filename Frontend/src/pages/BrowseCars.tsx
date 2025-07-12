@@ -1,6 +1,6 @@
-import { faGrip, faL, faTableCells } from "@fortawesome/free-solid-svg-icons";
+import { faGrip, faTableCells } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { getAllCars } from "../services/carsService";
 import type { CarType } from "../interfaces/Cars/Car";
@@ -21,6 +21,18 @@ const BrowseCars = () => {
     handlePageClick();
   }, []);
 
+  // filtering search input
+  useEffect(() => {
+    if (allCars) {
+      let filtered: CarType[] = [...allCars];
+      filtered = filtered.filter((car) =>
+        car.make.toLowerCase().includes(searching?.toLowerCase() as string)
+      );
+      setFilteredCollection(filtered);
+    }
+  }, [searching, allCars]);
+
+  // filtering drop menu
   useEffect(() => {
     if (filtering && allCars) {
       const filtered: CarType[] = [...allCars];
@@ -72,6 +84,9 @@ const BrowseCars = () => {
           </p>
           <div className="flex justify-between items-center  mt-5 w-fit gap-5">
             <input
+              onChange={(e) => {
+                setSearching(e.target.value);
+              }}
               type="search"
               className="border border-black/20 rounded-md px-10 py-2"
               placeholder="Search cars..."

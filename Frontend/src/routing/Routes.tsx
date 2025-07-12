@@ -20,10 +20,10 @@ const AppRoutes = () => {
           <Route path="browse-cars" element={<BrowseCars />} />
           <Route path="car-details" element={<CarDetails />} />
           <Route path="sell-car" element={<SellCar />} />
-          <Route path="sign-up" element={<Signup />} />
-          <Route path="sign-in" element={<SignIn />} />
           <Route path="*" element={<NotFound />} />
         </Route>
+        <Route path="/sign-up" element={<Signup />} />
+        <Route path="/sign-in" element={<SignIn />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

@@ -13,6 +13,7 @@ import type { CarType } from "../interfaces/Cars/Car";
 import type { ReviewType } from "../interfaces/review/review";
 import { getAllReviews } from "../services/reviewsService";
 import ReviewCard from "../components/ui/ReviewCard";
+import { handleError } from "../util/errorHandler";
 function Home() {
   const [featuredCars, setFeaturedCars] = useState<CarType[] | null>(null);
   const [RecentCars, setRecentCars] = useState<CarType[] | null>(null);
@@ -27,7 +28,7 @@ function Home() {
         setAllReviews(reviews.data);
       })
       .catch((error) => {
-        console.error("One of the requests failed:", error);
+        handleError(error);
       });
   }, []);
 

@@ -1,19 +1,8 @@
 import { faCarSide } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { RefreshToken } from "../services/authService";
 
 function Nav() {
-  // useEffect(() => {
-  //   RefreshToken()
-  //     .then((res) => {
-  //       console.log(res);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }, []);
   return (
     <nav className="shadow-lg w-full sticky top-0 left-0 z-50 bg-white">
       <div className="flex justify-between items-center container py-3 ">
