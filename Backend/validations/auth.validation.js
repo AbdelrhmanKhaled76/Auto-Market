@@ -5,11 +5,16 @@ const signupValidation = [
     .trim()
     .escape()
     .notEmpty()
-    .withMessage("Name field is required"),
+    .withMessage("Name field is required")
+    .isLength({ max: 15 })
+    .withMessage("username must be less than 15 characters"),
   body("email").normalizeEmail().isEmail().withMessage("Invalid email"),
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters long"),
+  body("confirmPassword")
+    .custom((value, { req }) => value === req.body.password)
+    .withMessage("Passwords must match"),
   body("phoneNumber")
     .notEmpty()
     .withMessage("phone number is required")
