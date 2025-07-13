@@ -4,6 +4,7 @@ import { lazy, Suspense } from "react";
 import MainLayout from "../layouts/MainLayout";
 import NotFound from "../pages/NotFound";
 import CarDetails from "../layouts/carDetails";
+import Profile from "../pages/Profile";
 
 const Home = lazy(() => import("../pages/Home"));
 const BrowseCars = lazy(() => import("../pages/BrowseCars"));
@@ -17,6 +18,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="browse-cars" element={<BrowseCars />} />
           <Route path="car-details" element={<CarDetails />} />
           <Route path="sell-car" element={<SellCar />} />

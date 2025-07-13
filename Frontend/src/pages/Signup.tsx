@@ -16,7 +16,7 @@ import "react-phone-number-input/style.css";
 import type { SignupType } from "../interfaces/auth/Signup";
 import { signupUser } from "../services/authService";
 import toast from "react-hot-toast";
-import { handleError } from "../util/errorHandler";
+import { handleError } from "../util/functions/errorHandler";
 import type { Advantage } from "../interfaces/Advantage";
 
 function Signup() {

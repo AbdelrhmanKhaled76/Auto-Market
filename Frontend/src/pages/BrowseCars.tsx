@@ -50,8 +50,6 @@ const BrowseCars = () => {
   // pagination handling
   async function handlePageClick(event?: { selected: number }): Promise<void> {
     const newPage: number = event ? event.selected + 1 : 1;
-    console.log("User selected page:", newPage);
-
     try {
       const data = await getAllCars(newPage, perPage);
       setAllCars(data.data);

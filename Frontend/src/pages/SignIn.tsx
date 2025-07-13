@@ -10,18 +10,17 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import "react-phone-number-input/style.css";
-import { signinUser } from "../services/authService";
-import toast from "react-hot-toast";
-import { handleError } from "../util/errorHandler";
 import type { Advantage } from "../interfaces/Advantage";
 import type { SigninType } from "../interfaces/auth/Signin";
 import { faFacebook, faGoogle } from "@fortawesome/free-brands-svg-icons";
+import { useAuth } from "../util/hooks/authHook";
 
 const SignIn = () => {
+  const { handleSignIn } = useAuth();
   const [togglePassword, setTogglePassword] = useState(false);
   const advantages: Advantage[] = [
     {
@@ -40,7 +39,6 @@ const SignIn = () => {
       description: "Easy listing creation and management",
     },
   ];
-  const navigate = useNavigate();
   const signinForm = useFormik<SigninType>({
     initialValues: {
       email: "",
@@ -53,18 +51,8 @@ const SignIn = () => {
         .required("Password is required"),
     }),
     onSubmit: async (values, { setSubmitting }) => {
-      try {
-        const response = await signinUser(values);
-        toast.success("user loged in successfully");
-        localStorage.setItem("id", response.data.userId);
-        localStorage.setItem("username", response.data.username);
-        localStorage.setItem("token", response.accessToken);
-        navigate("/");
-      } catch (error) {
-        handleError(error);
-      } finally {
-        setSubmitting(false);
-      }
+      await handleSignIn(values, setSubmitting);
+      console.log(values);
     },
   });
   return (

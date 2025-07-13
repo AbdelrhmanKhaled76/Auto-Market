@@ -1,4 +1,5 @@
 import axiosInstance from "../interceptors/auth-interceptor";
+import { refreshAxios } from "../interceptors/refresh-interceptor";
 import type { SigninType } from "../interfaces/auth/Signin";
 import type { SignupType } from "../interfaces/auth/Signup";
 
@@ -15,6 +16,6 @@ export const logoutUser = async () => {
   return response.data;
 };
 export const refreshToken = async () => {
-  const response = await axiosInstance.post(`/auth/refreshToken`);
+  const response = await refreshAxios.post(`/auth/refreshToken`);
   return response.data;
 };

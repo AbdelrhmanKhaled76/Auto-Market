@@ -1,24 +1,10 @@
 import { faCarSide, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { refreshToken } from "../services/authService";
-import { handleError } from "../util/errorHandler";
+import { useAuth } from "../util/hooks/authHook";
 
 function Nav() {
-  const [token, setToken] = useState<string | undefined>(undefined);
-  useEffect(() => {
-    const accessToken: string | null = localStorage.getItem("token");
-    if (accessToken) {
-      setToken(accessToken);
-    } else {
-      refreshToken()
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => handleError(err));
-    }
-  }, []);
+  const { token, handleLogOut } = useAuth();
   return (
     <nav className="shadow-lg w-full sticky top-0 left-0 z-50 bg-white">
       <div className="flex justify-between items-center container py-3 ">
@@ -80,21 +66,34 @@ function Nav() {
               </NavLink>
             </li>
             {token ? (
-              <li>
-                <NavLink
-                  to="/profile"
-                  className={({ isActive }) =>
-                    `capitalize font-medium text-sm px-3 py-2 ${
-                      isActive
-                        ? "bg-[var(--primary-color)]/10 rounded text-[var(--primary-color)]"
-                        : ""
-                    }`
-                  }
-                >
-                  <FontAwesomeIcon icon={faUser} className="me-2" />
-                  profile
-                </NavLink>
-              </li>
+              <>
+                <li>
+                  <NavLink
+                    to="/profile"
+                    className={({ isActive }) =>
+                      `capitalize font-medium text-sm px-3 py-2 ${
+                        isActive
+                          ? "bg-[var(--primary-color)]/10 rounded text-[var(--primary-color)]"
+                          : ""
+                      }`
+                    }
+                  >
+                    <FontAwesomeIcon icon={faUser} className="me-2" />
+                    profile
+                  </NavLink>
+                </li>
+                <li>
+                  <button
+                  type="button"
+                    onClick={async () => {
+                      await handleLogOut();
+                    }}
+                    className="capitalize font-medium text-sm px-3 py-2 bg-[var(--primary-color)] rounded-xl text-white cursor-pointer hover:bg-[var(--secondary-color)] transition-colors duration-300"
+                  >
+                    log out
+                  </button>
+                </li>
+              </>
             ) : (
               <>
                 <li className="capitalize font-medium text-sm">
