@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import "react-phone-number-input/style.css";
@@ -40,6 +40,7 @@ const SignIn = () => {
       description: "Easy listing creation and management",
     },
   ];
+  const navigate = useNavigate();
   const signinForm = useFormik<SigninType>({
     initialValues: {
       email: "",
@@ -55,7 +56,10 @@ const SignIn = () => {
       try {
         const response = await signinUser(values);
         toast.success("user loged in successfully");
-        console.log(response);
+        localStorage.setItem("id", response.data.userId);
+        localStorage.setItem("username", response.data.username);
+        localStorage.setItem("token", response.accessToken);
+        navigate("/");
       } catch (error) {
         handleError(error);
       } finally {
@@ -63,7 +67,6 @@ const SignIn = () => {
       }
     },
   });
-
   return (
     <div className="lg:grid lg:grid-cols-2 items-center">
       <section className="py-10 h-screen w-full flex justify-center items-center flex-col">

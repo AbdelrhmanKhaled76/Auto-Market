@@ -1,8 +1,24 @@
-import { faCarSide } from "@fortawesome/free-solid-svg-icons";
+import { faCarSide, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { refreshToken } from "../services/authService";
+import { handleError } from "../util/errorHandler";
 
 function Nav() {
+  const [token, setToken] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    const accessToken: string | null = localStorage.getItem("token");
+    if (accessToken) {
+      setToken(accessToken);
+    } else {
+      refreshToken()
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => handleError(err));
+    }
+  }, []);
   return (
     <nav className="shadow-lg w-full sticky top-0 left-0 z-50 bg-white">
       <div className="flex justify-between items-center container py-3 ">
@@ -63,34 +79,54 @@ function Nav() {
                 sell car
               </NavLink>
             </li>
-            <li className="capitalize font-medium text-sm">
-              <NavLink
-                to="/sign-up"
-                className={({ isActive }) =>
-                  `capitalize font-medium text-sm px-3 py-2 ${
-                    isActive
-                      ? "bg-[var(--primary-color)]/10 rounded text-[var(--primary-color)]"
-                      : ""
-                  }`
-                }
-              >
-                sign up
-              </NavLink>
-            </li>
-            <li className="capitalize font-medium text-sm">
-              <NavLink
-                to="/sign-in"
-                className={({ isActive }) =>
-                  `capitalize font-medium text-sm px-3 py-2 ${
-                    isActive
-                      ? "bg-[var(--primary-color)]/10 rounded text-[var(--primary-color)]"
-                      : ""
-                  }`
-                }
-              >
-                sign in
-              </NavLink>
-            </li>
+            {token ? (
+              <li>
+                <NavLink
+                  to="/profile"
+                  className={({ isActive }) =>
+                    `capitalize font-medium text-sm px-3 py-2 ${
+                      isActive
+                        ? "bg-[var(--primary-color)]/10 rounded text-[var(--primary-color)]"
+                        : ""
+                    }`
+                  }
+                >
+                  <FontAwesomeIcon icon={faUser} className="me-2" />
+                  profile
+                </NavLink>
+              </li>
+            ) : (
+              <>
+                <li className="capitalize font-medium text-sm">
+                  <NavLink
+                    to="/sign-up"
+                    className={({ isActive }) =>
+                      `capitalize font-medium text-sm px-3 py-2 ${
+                        isActive
+                          ? "bg-[var(--primary-color)]/10 rounded text-[var(--primary-color)]"
+                          : ""
+                      }`
+                    }
+                  >
+                    sign up
+                  </NavLink>
+                </li>
+                <li className="capitalize font-medium text-sm">
+                  <NavLink
+                    to="/sign-in"
+                    className={({ isActive }) =>
+                      `capitalize font-medium text-sm px-3 py-2 ${
+                        isActive
+                          ? "bg-[var(--primary-color)]/10 rounded text-[var(--primary-color)]"
+                          : ""
+                      }`
+                    }
+                  >
+                    sign in
+                  </NavLink>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>

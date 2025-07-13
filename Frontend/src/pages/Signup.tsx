@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
@@ -44,6 +44,7 @@ function Signup() {
       description: "Your data is protected with enterprise-grade security",
     },
   ];
+  const navigate = useNavigate();
   const signupForm = useFormik<SignupType>({
     initialValues: {
       username: "",
@@ -73,6 +74,7 @@ function Signup() {
       try {
         await signupUser(values);
         toast.success("user registered successfully");
+        navigate("/signin");
       } catch (error) {
         handleError(error);
       } finally {
