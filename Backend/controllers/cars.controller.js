@@ -1,18 +1,14 @@
-const carModel = require("../models/car.model");
-const userModel = require("../models/user.model");
-const uploadToCloudinary = require("../shared/functions/uploadToCloudinary");
+const {
+  featuredCarsService,
+  recentCarsService,
+  allCarsService,
+  carDetailService,
+  sellCarService,
+} = require("../services/cars.service");
 
 const featuredCars = async (req, res, next) => {
   try {
-    const cars = await carModel
-      .find({
-        featured: true,
-      })
-      .limit(3);
-    if (!cars) {
-      const err = new Error("no featured cars available");
-      return next(err);
-    }
+    const cars = await featuredCarsService();
     res.json({
       success: true,
       message: "featured cars are sent successfully",
@@ -25,16 +21,7 @@ const featuredCars = async (req, res, next) => {
 
 const recentCars = async (req, res, next) => {
   try {
-    const cars = await carModel
-      .find()
-      .sort({
-        createdAt: -1,
-      })
-      .limit(6);
-    if (!cars) {
-      const err = new Error("no featured cars available");
-      return next(err);
-    }
+    const cars = await recentCarsService();
     res.json({
       success: true,
       message: "recent cars are sent successfully",
@@ -50,23 +37,10 @@ const allCars = async (req, res, next) => {
   const CarsNum = parseInt(req.query.carsNum) || 6; // default 10 per page
 
   try {
-    const carsCount = await carModel.countDocuments();
-
-    const totalPages = Math.ceil(carsCount / CarsNum);
-
-    if (currentPage > totalPages) {
-      const err = new Error("No cars available on this page");
-      err.statusCode = 404;
-      return next(err);
-    }
-
-    const skip = (currentPage - 1) * CarsNum;
-
-    const cars = await carModel
-      .find()
-      .sort({ createdAt: -1 }) // Optional: newest first
-      .skip(skip)
-      .limit(CarsNum);
+    const { carsCount, totalPages, cars } = await allCarsService({
+      currentPage,
+      CarsNum,
+    });
 
     res.json({
       success: true,
@@ -85,12 +59,7 @@ const allCars = async (req, res, next) => {
 const carDetail = async (req, res, next) => {
   const id = req.params.id;
   try {
-    const car = await carModel.findById(id);
-    if (!car) {
-      const err = new Error("car not found");
-      err.statusCode = 404;
-      return next(err);
-    }
+    const car = await carDetailService({ id });
     res.status(200).json({
       message: "car details is sent successfully",
       success: true,
@@ -102,83 +71,22 @@ const carDetail = async (req, res, next) => {
 };
 
 const sellCar = async (req, res, next) => {
-  const {
-    make,
-    model,
-    year,
-    price,
-    mileage,
-    condition,
-    transmission,
-    fuelType,
-    bodyType,
-    features,
-    description,
-    featured,
-  } = req.body;
-
   try {
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: "No files uploaded" });
-    }
-
-    // Upload all files to Cloudinary
-    const uploadResults = await Promise.all(
-      req.files.map((file) => uploadToCloudinary(file.buffer))
-    );
-    if (uploadResults.some((res) => !res.secure_url || !res.public_id)) {
-      const err = new Error("One or more images failed to upload");
-      err.statusCode = 500;
-      return next(err);
-    }
-
-    // You can now store these in your database
-    const images = uploadResults.map((result) => ({
-      url: result.secure_url,
-      publicId: result.public_id,
-    }));
-
-    const user = await userModel.findById(req.user.id).select("-password");
-
-    if (!user) {
-      const err = new Error("user not found");
-      err.statusCode = 404;
-      return next(err);
-    }
-
-    const car = await carModel.create({
-      bodyType,
-      condition,
-      description,
-      features,
-      fuelType,
-      images,
-      seller: user,
-      make,
-      mileage,
-      model,
-      price,
-      transmission,
-      year,
-      featured,
-    });
-
-    await userModel.findByIdAndUpdate(req.user.id, {
-      $push: { selling: car._id },
-    });
-
+    const { body, files, user } = req;
+    const car = await sellCarService(body, files, user);
     res.status(201).json({
       success: true,
-      message: "car is offered for selling successfully",
+      message: "Car is offered for selling successfully",
       data: {
         carInfo: car.toObject(),
       },
     });
   } catch (error) {
-    if (error.statusCode === 11000) {
-      error.message = "duplicated cars";
+    if (error.code === 11000) {
+      error.message = "Duplicated car entry";
+      error.statusCode = 409;
     }
-    return next(error);
+    next(error);
   }
 };
 

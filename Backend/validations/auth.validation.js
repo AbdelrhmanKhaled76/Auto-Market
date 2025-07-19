@@ -1,27 +1,45 @@
 const { body } = require("express-validator");
-const { default: parsePhoneNumberFromString } = require("libphonenumber-js");
+const { parsePhoneNumberFromString } = require("libphonenumber-js");
+
+// Signup validation
 const signupValidation = [
   body("username")
     .trim()
     .escape()
     .notEmpty()
-    .withMessage("Name field is required")
+    .withMessage("Username is required")
+    .isLength({ min: 3 })
+    .withMessage("Username must be at least 3 characters long")
     .isLength({ max: 15 })
-    .withMessage("username must be less than 15 characters"),
-  body("email").normalizeEmail().isEmail().withMessage("Invalid email"),
+    .withMessage("Username must be less than 15 characters")
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage("Username can only contain letters, numbers, and underscores"),
+
+  body("email")
+    .trim()
+    .normalizeEmail()
+    .isEmail()
+    .withMessage("Invalid email address"),
+
   body("password")
     .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long"),
+    .withMessage("Password must be at least 6 characters long")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+    .withMessage(
+      "Password must contain uppercase, lowercase, number and special character"
+    ),
+
   body("confirmPassword")
     .custom((value, { req }) => value === req.body.password)
     .withMessage("Passwords must match"),
+
   body("phoneNumber")
     .notEmpty()
-    .withMessage("phone number is required")
+    .withMessage("Phone number is required")
     .custom((value) => {
       const phone = value.startsWith("+")
-        ? parsePhoneNumberFromString(value) // full international
-        : parsePhoneNumberFromString(value, "EG"); // local format fallback
+        ? parsePhoneNumberFromString(value)
+        : parsePhoneNumberFromString(value, "EG"); // fallback to Egypt as default
 
       if (!phone || !phone.isValid()) {
         throw new Error("Invalid phone number format");
@@ -31,9 +49,15 @@ const signupValidation = [
     }),
 ];
 
+// Sign in validation
 const signInValidation = [
-  body("email").normalizeEmail().isEmail().withMessage("Invalid email"),
-  body("password").notEmpty().withMessage("password field can't be empty"),
+  body("email")
+    .trim()
+    .normalizeEmail()
+    .isEmail()
+    .withMessage("Invalid email address"),
+
+  body("password").notEmpty().withMessage("Password cannot be empty"),
 ];
 
 module.exports = {

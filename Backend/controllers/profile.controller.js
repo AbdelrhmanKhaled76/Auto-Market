@@ -1,15 +1,12 @@
-const userModel = require("../models/user.model");
-const bcrypt = require("bcrypt");
+const {
+  getProfileService,
+  editProfileService,
+  updatePasswordService,
+} = require("../services/profile.service");
 
 const getProfile = async (req, res, next) => {
   try {
-    const userInfo = await userModel.findById(req.user.id).select("-password");
-
-    if (!userInfo) {
-      const err = new Error("user not found");
-      err.statusCode = 404;
-      return next(err);
-    }
+    const userInfo = await getProfileService(req.user);
 
     return res.status(200).json({
       success: true,
@@ -22,41 +19,8 @@ const getProfile = async (req, res, next) => {
 };
 
 const editProfileInfo = async (req, res, next) => {
-  const { username, email, phoneNumber } = req.body;
   try {
-    const userInfo = await userModel.findById(req.user.id).select("-password");
-    if (!userInfo) {
-      const err = new Error("user not found");
-      err.statusCode = 404;
-      return next(err);
-    }
-    if (
-      userInfo.username === username &&
-      userInfo.email === email &&
-      userInfo.phoneNumber === phoneNumber
-    ) {
-      const err = new Error("nothing changed to update");
-      err.statusCode = 403;
-      return next(err);
-    }
-
-    const updatedUser = await userModel
-      .findByIdAndUpdate(
-        req.user.id,
-        {
-          $set: {
-            email,
-            username,
-            phoneNumber,
-            updatedAt: new Date(),
-          },
-        },
-        {
-          new: true,
-        }
-      )
-      .select("-password");
-
+    const updatedUser = await editProfileService(req.body, req.user);
     return res.status(200).json({
       success: true,
       message: "user info updated successfully",
@@ -68,32 +32,8 @@ const editProfileInfo = async (req, res, next) => {
 };
 
 const updatePassword = async (req, res, next) => {
-  const { password } = req.body;
   try {
-    const userInfo = await userModel.findById(req.user.id).select("password");
-
-    if (!userInfo) {
-      const err = new Error("user not found");
-      err.statusCode = 404;
-      return next(err);
-    }
-
-    const isMatch = await bcrypt.compare(password, userInfo.password);
-
-    if (isMatch) {
-      const err = new Error("nothing changed to update");
-      err.statusCode = 403;
-      return next(err);
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedNewPassword = await bcrypt.hash(password, salt);
-
-    await userModel.findByIdAndUpdate(req.user.id, {
-      $set: {
-        password: hashedNewPassword,
-      },
-    });
+    await updatePasswordService(req.body, req.user);
 
     return res.status(200).json({
       success: true,

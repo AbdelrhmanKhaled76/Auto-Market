@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/user.model");
-const bcrypt = require("bcrypt");
 const {
   JWT_SECRET,
   JWT_EXPIRE,
@@ -8,37 +7,19 @@ const {
   JWT_REFRESH_EXPIRE,
   NODE_ENV,
 } = require("../config/env");
+const { signUpService, signInService } = require("../services/auth.service");
 
 const signUp = async (req, res, next) => {
+  const data = req.body;
   try {
-    const { username, email, password, phoneNumber } = req.body;
-
-    const exisitingUser = await userModel.findOne({ email });
-
-    if (exisitingUser) {
-      const error = new Error("user already exists");
-      error.statusCode = 409;
-      return next(error);
-    }
-
-    let newUsers = await userModel.create([
-      {
-        username,
-        email,
-        password,
-        phoneNumber,
-        createdAt: new Date(),
-      },
-    ]);
-
-    // newUsers is an array (since you used .create with an array)
+    const newUser = await signUpService(data);
 
     res.status(201).json({
       message: "user is created successfully",
       success: true,
       data: {
-        id: newUsers[0]._id,
-        username: newUsers[0].username,
+        id: newUser._id,
+        username: newUser.username,
       },
     });
   } catch (err) {
@@ -47,65 +28,35 @@ const signUp = async (req, res, next) => {
 };
 
 const signIn = async (req, res, next) => {
-  const { email, password } = req.body;
+  const data = req.body;
 
   try {
-    const user = await userModel.findOne(
-      {
-        email,
+    const payload = await signInService(data);
+
+    const token = jwt.sign(payload, JWT_SECRET, {
+      expiresIn: JWT_EXPIRE,
+    });
+
+    const refreshToken = jwt.sign(payload, JWT_REFRESH, {
+      expiresIn: JWT_REFRESH_EXPIRE,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return res.status(200).json({
+      success: true,
+      data: {
+        userId: payload.id,
+        username: payload.username,
       },
-      {
-        email: 1,
-        username: 1,
-        password: 1,
-      }
-    );
+      accessToken: token,
+    });
 
-    // handling not found user
-    if (!user) {
-      const error = new Error("Invalid email or password");
-      error.statusCode = 401;
-      return next(error);
-    }
-
-    // comapring passwords
-    const isPasswordRight = await bcrypt.compare(password, user.password);
-
-    if (isPasswordRight) {
-      const payload = {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-      };
-      const token = jwt.sign(payload, JWT_SECRET, {
-        expiresIn: JWT_EXPIRE,
-      });
-
-      const refreshToken = jwt.sign(payload, JWT_REFRESH, {
-        expiresIn: JWT_REFRESH_EXPIRE,
-      });
-
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: NODE_ENV === "production",
-        sameSite: "Strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
-      return res.status(200).json({
-        success: true,
-        data: {
-          userId: user.id,
-          username: user.username,
-        },
-        accessToken: token,
-      });
-    }
-    //handling wrong password
-    else {
-      const error = new Error("Invalid email or password");
-      error.statusCode = 401;
-      return next(error);
-    }
+    // handling wrong password
   } catch (err) {
     err.statusCode = 400;
     return next(err);
@@ -138,7 +89,7 @@ const refreshToken = async (req, res, next) => {
 
     // Generate new access token
     const accessToken = jwt.sign(
-      { id: user._id, email: user.email },
+      { id: user._id, email: user.email, username: user.username },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRE }
     );

@@ -1,28 +1,15 @@
-const reviewModel = require("../models/review.model");
-const userModel = require("../models/user.model");
+const {
+  addReviewService,
+  editReviewService,
+  deleteReviewService,
+  getReviewService,
+  getAllReviewsService,
+} = require("../services/review.service");
 
 const addReview = async (req, res, next) => {
-  const { rating, description } = req.body;
   try {
-    const existingReview = await reviewModel.findOne({ madeBy: req.user.id });
+    const review = await addReviewService(req.body, req.user);
 
-    if (existingReview) {
-      const err = new Error("review already exist");
-      err.statusCode = 400;
-      return next(err);
-    }
-    const review = await reviewModel.create({
-      description,
-      rating,
-      madeBy: req.user.id,
-    });
-    if (!review) {
-      const err = new Error("something went wrong");
-      return next(err);
-    }
-    await userModel.findByIdAndUpdate(req.user.id, {
-      $set: { review: review._id },
-    });
     res.status(200).json({
       message: "review is created successfully",
       success: true,
@@ -38,38 +25,8 @@ const addReview = async (req, res, next) => {
 };
 
 const editReview = async (req, res, next) => {
-  const { rating, description } = req.body;
-  const { reviewId } = req.params;
   try {
-    const previousReview = await reviewModel.findById(reviewId);
-
-    if (!previousReview) {
-      const err = new Error("review not found");
-      err.statusCode = 404;
-      return next(err);
-    }
-
-    if (previousReview.madeBy.toString() !== req.user.id) {
-      const err = new Error("forbidden");
-      err.statusCode = 403;
-      return next(err);
-    }
-
-    if (
-      previousReview.rating === rating &&
-      previousReview.description === description
-    ) {
-      const err = new Error("nothing changed to edit");
-      return next(err);
-    }
-
-    const newReview = await reviewModel.findByIdAndUpdate(reviewId, {
-      $set: {
-        description,
-        rating,
-        updatedAt: new Date(),
-      },
-    });
+    const newReview = await editReviewService(req.body, req.params, req.user);
 
     res.status(200).json({
       success: true,
@@ -82,23 +39,8 @@ const editReview = async (req, res, next) => {
 };
 
 const deleteReview = async (req, res, next) => {
-  const { reviewId } = req.params;
   try {
-    const previousReview = await reviewModel.findById(reviewId);
-
-    if (!previousReview) {
-      const err = new Error("review not found");
-      err.statusCode = 404;
-      return next(err);
-    }
-
-    if (previousReview.madeBy.toString() !== req.user.id) {
-      const err = new Error("forbidden: You can only delete your own review");
-      err.statusCode = 403;
-      return next(err);
-    }
-
-    await reviewModel.findByIdAndDelete(reviewId);
+    await deleteReviewService(req.params, req.user);
 
     return res.status(200).json({
       success: true,
@@ -113,24 +55,12 @@ const getReview = async (req, res, next) => {
   const { reviewId } = req.params;
 
   try {
-    const Review = await reviewModel.findById(reviewId);
-
-    if (!Review) {
-      const err = new Error("review not found");
-      err.statusCode = 404;
-      return next(err);
-    }
-
-    if (Review.madeBy.toString() !== req.user.id) {
-      const err = new Error("forbidden: You can only delete your own review");
-      err.statusCode = 403;
-      return next(err);
-    }
+    const review = await getReviewService(req.params, req.user);
 
     return res.status(200).json({
       success: true,
       message: "review is retrieved successfully",
-      data: Review,
+      data: review,
     });
   } catch (error) {
     return next(error);
@@ -139,7 +69,7 @@ const getReview = async (req, res, next) => {
 
 const getAllReviews = async (req, res, next) => {
   try {
-    const reviews = await reviewModel.find().populate("madeBy");
+    const reviews = await getAllReviewsService();
 
     return res.status(200).json({
       message: "reviews are retrieved successfully",
